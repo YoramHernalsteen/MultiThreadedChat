@@ -1,5 +1,4 @@
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 
 public class ServerThread extends Thread {
@@ -22,9 +21,15 @@ public class ServerThread extends Thread {
 
     private void handleConnection() throws IOException, InterruptedException {
         OutputStream outputStream = clientSocket.getOutputStream();
-        for(int i =0 ; i<10; i++){
-            outputStream.write(("Helloo" + i + "\n").getBytes());
-            Thread.sleep(1000);
+        InputStream inputStream = clientSocket.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while((line=reader.readLine()) != null){
+            if ("quit".equalsIgnoreCase(line)) {
+                break;
+            }
+            String typedLine = "You typed: " + line + "\n";
+            outputStream.write(typedLine.getBytes());
         }
         clientSocket.close();
     }
