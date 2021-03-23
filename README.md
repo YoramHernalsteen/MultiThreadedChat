@@ -11,9 +11,12 @@ Upon logging in each existing client of the server will get notified of the new 
 login \<user> \<password>
 ##### Quit
 logout
+
 quit
 ##### Send a message to a single user
 m \<receiver> \<message>
+
 msg \<receiver> \<message>
+
 message \<receiver> \<message>
 
