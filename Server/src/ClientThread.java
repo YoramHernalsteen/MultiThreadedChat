@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class ClientThread extends Thread {
@@ -8,6 +9,7 @@ public class ClientThread extends Thread {
     private String user;
     private final ServerThread serverThread;
     private OutputStream outputStream;
+    private HashSet<String> topicSet = new HashSet<>();
 
     public ClientThread(ServerThread serverThread, Socket clientSocket) {
         this.clientSocket = clientSocket;
@@ -52,6 +54,20 @@ public class ClientThread extends Thread {
                             send("message not formatted properly \r\n");
                         }
                         break;
+                    case "join":
+                        if(input.length>1){
+                            joinTopic(input);
+                        } else{
+                            send("topic join not formatted properly \r\n");
+                        }
+                        break;
+                    case "leave":
+                        if(input.length>1){
+                            leaveTopic(input);
+                        } else{
+                            send("topic leave not formatted properly \r\n");
+                        }
+                        break;
                     default:
                         this.outputStream.write(("unknown: " + command + "\r\n").getBytes());
                         break;
@@ -60,14 +76,35 @@ public class ClientThread extends Thread {
         }
     }
 
+    private void leaveTopic(String[] input) {
+        String topic = input[1];
+        this.topicSet.remove(topic);
+    }
+
+    private boolean isMemberOfTopic(String topic){
+        return this.topicSet.contains(topic);
+    }
+    private void joinTopic(String[] input) {
+        String topic = input[1];
+        this.topicSet.add(topic);
+    }
+
     private void sendMessage(String[] messageCommand) throws IOException {
         String receiver = messageCommand[1];
         String message = messageCommand[2];
         List<ClientThread>clientThreadList = this.serverThread.getClientThreadList();
         for(ClientThread clientThread : clientThreadList){
-            if(receiver.equals(clientThread.getUser())){
-                clientThread.send(this.getUser() + ": " + message + "\r\n");
+            if(receiver.charAt(0) == '#'){
+                if(clientThread.isMemberOfTopic(receiver)){
+                    clientThread.send(this.getUser() + " to "+ receiver + ": " + message + "\r\n");
+                }
+
+            } else{
+                if(receiver.equals(clientThread.getUser())){
+                    clientThread.send(this.getUser() + ": " + message + "\r\n");
+                }
             }
+
         }
     }
 
