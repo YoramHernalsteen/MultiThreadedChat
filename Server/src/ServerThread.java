@@ -32,4 +32,8 @@ public class ServerThread extends Thread {
             e.printStackTrace();
         }
     }
+
+    public void removeClientThread(ClientThread clientThread) {
+        this.clientThreadList.remove(clientThread);
+    }
 }

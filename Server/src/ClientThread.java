@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ClientThread extends Thread {
     private final Socket clientSocket;
@@ -41,20 +42,41 @@ public class ClientThread extends Thread {
                     case "login":
                         handleLogin(input);
                         break;
+                    case "m":
+                    case "msg":
+                    case "message":
+                        String [] messageCommand = line.split(" ",3);
+                        if(messageCommand.length>2){
+                            sendMessage(messageCommand);
+                        } else{
+                            send("message not formatted properly \r\n");
+                        }
+                        break;
                     default:
                         this.outputStream.write(("unknown: " + command + "\r\n").getBytes());
                         break;
                 }
             }
         }
-        exit_loop: ;
+    }
+
+    private void sendMessage(String[] messageCommand) throws IOException {
+        String receiver = messageCommand[1];
+        String message = messageCommand[2];
+        List<ClientThread>clientThreadList = this.serverThread.getClientThreadList();
+        for(ClientThread clientThread : clientThreadList){
+            if(receiver.equals(clientThread.getUser())){
+                clientThread.send(this.getUser() + ": " + message + "\r\n");
+            }
+        }
     }
 
     private void handleLogout() throws IOException {
+        this.serverThread.removeClientThread(this);
         ArrayList<ClientThread> clientThreadList = serverThread.getClientThreadList();
         for(ClientThread clientThread: clientThreadList){
             if(!this.user.equals(clientThread.getUser())){
-                clientThread.sendNotification(this.user+" is now offline \r\n");
+                clientThread.send(this.user+" is now offline \r\n");
             }
         }
         clientSocket.close();
@@ -77,9 +99,9 @@ public class ClientThread extends Thread {
                 for(ClientThread clientThread: clientThreadList){
                     if(!this.user.equals(clientThread.getUser())){
                         if(clientThread.getUser() != null){
-                          sendNotification(clientThread.getUser() + " is online \r\n");
+                          send(clientThread.getUser() + " is online \r\n");
                         }
-                        clientThread.sendNotification(this.user+" is now online \r\n");
+                        clientThread.send(this.user+" is now online \r\n");
                     }
                 }
             } else {
@@ -88,7 +110,7 @@ public class ClientThread extends Thread {
         }
     }
 
-    private void sendNotification(String message) throws IOException {
+    private void send(String message) throws IOException {
         if(this.user != null){
             this.outputStream.write(message.getBytes());
         }
