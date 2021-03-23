@@ -25,11 +25,17 @@ public class ServerThread extends Thread {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
         while((line=reader.readLine()) != null){
-            if ("quit".equalsIgnoreCase(line)) {
-                break;
+            String [] input = line.split(" ");
+            if(input !=null && input.length>0){
+                String command = input[0];
+                if ("quit".equalsIgnoreCase(command)) {
+                    break;
+                } else{
+                    outputStream.write(("unknown: " + command + "\r\n").getBytes());
+                }
+
             }
-            String typedLine = "You typed: " + line + "\n";
-            outputStream.write(typedLine.getBytes());
+
         }
         clientSocket.close();
     }
