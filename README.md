@@ -11,7 +11,13 @@ As of right now three accounts exist:
 * tim - tim
 * tom - tom
 
-### Commands
+### How to use
+
+Make sure telnet is available, afterwards create a connection in your terminal! If you have 2 instances running, they will be able to communicate with each other. 
+#### Open connection
+telnet localhost 8088
+
+#### Commands
 ##### Login
 login \<user> \<password>
 ##### Quit
