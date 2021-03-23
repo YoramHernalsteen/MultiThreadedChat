@@ -48,6 +48,9 @@ public class ClientThread extends Thread {
         clientSocket.close();
     }
 
+    /*
+    * After successful login, all clients will get notified. This client will get notified about the existence of the other clients.
+    * */
     private void handleLogin( String[] input) throws IOException {
         if (input.length > 2) {
             String userToCheck = input[1];
@@ -56,11 +59,16 @@ public class ClientThread extends Thread {
                     (userToCheck.equals("tim") && password.equals("tim")) ||
                     (userToCheck.equals("tom") && password.equals("tom"))
             ) {
-                this.outputStream.write((userToCheck + " logged in! \r\n").getBytes());
+                this.outputStream.write(("login ok \r\n").getBytes());
                 this.user = userToCheck;
                 ArrayList<ClientThread> clientThreadList = serverThread.getClientThreadList();
                 for(ClientThread clientThread: clientThreadList){
-                    clientThread.sendNotification(this.user+" is now online \r\n");
+                    if(!this.user.equals(clientThread.getUser())){
+                        if(clientThread.getUser() != null){
+                          sendNotification(clientThread.getUser() + " is online \r\n");
+                        }
+                        clientThread.sendNotification(this.user+" is now online \r\n");
+                    }
                 }
             } else {
                 this.outputStream.write(("login failed for user:" + userToCheck + " with password:" + password + " \r\n").getBytes());
@@ -69,7 +77,9 @@ public class ClientThread extends Thread {
     }
 
     private void sendNotification(String message) throws IOException {
-        this.outputStream.write(message.getBytes());
+        if(this.user != null){
+            this.outputStream.write(message.getBytes());
+        }
     }
 
     public String getUser(){

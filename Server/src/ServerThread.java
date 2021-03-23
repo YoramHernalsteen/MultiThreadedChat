@@ -15,6 +15,9 @@ public class ServerThread extends Thread {
         return this.clientThreadList;
     }
 
+    /*
+    * The server thread is responsible for accepting and creating new client threads. Every client has its own thread.
+    * */
     @Override
     public void run(){
         try {
