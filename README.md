@@ -8,3 +8,5 @@ Upon logging in each existing client of the server will get notified of the new 
 
 ### Commands
 login \<user> \<password>
+
+logout or quit
