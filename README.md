@@ -19,4 +19,13 @@ m \<receiver> \<message>
 msg \<receiver> \<message>
 
 message \<receiver> \<message>
+##### Join topic
+join \<topic> where topic always starts with prefix #
+##### Leave topic
+leave \<topic> where topic always starts with prefix #
+##### Send a message to all users subscribed to a certain topic
+m \<topic> \<message> where topic always starts with prefix #
 
+msg \<topic> \<message> where topic always starts with prefix #
+
+message \<topic> \<message> where topic always starts with prefix #
