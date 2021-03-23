@@ -6,6 +6,11 @@ For now, we use telnet to check wether clients can connect to the server. Each c
 
 Upon logging in each existing client of the server will get notified of the new user.
 
+As of right now three accounts exist: 
+* guest - guest
+* tim - tim
+* tom - tom
+
 ### Commands
 ##### Login
 login \<user> \<password>
