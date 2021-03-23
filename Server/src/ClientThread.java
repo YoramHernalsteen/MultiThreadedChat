@@ -29,13 +29,15 @@ public class ClientThread extends Thread {
         InputStream inputStream = clientSocket.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
-        while ((line = reader.readLine()) != null) {
+        loop: while ((line = reader.readLine()) != null) {
             String[] input = line.split(" ");
             if (input.length > 0) {
                 String command = input[0];
                 switch (command) {
                     case "quit":
-                        break;
+                    case "logout":
+                        handleLogout();
+                        break loop;
                     case "login":
                         handleLogin(input);
                         break;
@@ -43,6 +45,16 @@ public class ClientThread extends Thread {
                         this.outputStream.write(("unknown: " + command + "\r\n").getBytes());
                         break;
                 }
+            }
+        }
+        exit_loop: ;
+    }
+
+    private void handleLogout() throws IOException {
+        ArrayList<ClientThread> clientThreadList = serverThread.getClientThreadList();
+        for(ClientThread clientThread: clientThreadList){
+            if(!this.user.equals(clientThread.getUser())){
+                clientThread.sendNotification(this.user+" is now offline \r\n");
             }
         }
         clientSocket.close();
